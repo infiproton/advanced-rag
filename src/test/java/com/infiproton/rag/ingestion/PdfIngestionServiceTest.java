@@ -1,0 +1,33 @@
+package com.infiproton.rag.ingestion;
+
+import com.infiproton.rag.model.KnowledgeDocument;
+import lombok.extern.slf4j.Slf4j;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+
+import java.util.List;
+
+@SpringBootTest
+@Slf4j
+public class PdfIngestionServiceTest {
+
+    @Autowired
+    private PdfIngestionService pdfIngestionService;
+
+    @Test
+    void shouldLoadPdfDocuments() {
+        List<KnowledgeDocument> documents = pdfIngestionService.loadDocuments();
+        log.info("Documents Loaded: {}", documents.size());
+
+        for (KnowledgeDocument document : documents) {
+            log.info("Source: {}", document.getSource());
+            String content = document.getContent();
+
+            log.info("Content Preview: {}", content.substring(0, Math.min(200, content.length())));
+
+            log.info("Metadata: {}", document.getMetadata());
+            log.info("----------------------------------------");
+        }
+    }
+}

@@ -5,6 +5,10 @@ spring:
   ai:
     openai:
       api-key: ${OPENAI_API_KEY}
+    vectorstore:
+      pgvector:
+        initialize-schema: false
+        dimensions: 1536
 
   datasource:
     url: jdbc:postgresql://localhost:5432/support_db

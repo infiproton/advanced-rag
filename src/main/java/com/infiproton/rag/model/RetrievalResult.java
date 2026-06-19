@@ -1,0 +1,17 @@
+package com.infiproton.rag.model;
+
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import java.util.Map;
+
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+public class RetrievalResult {
+    private String content;
+    private Double score;
+    private Map<String, Object> metadata;
+}

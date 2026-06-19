@@ -1,5 +1,6 @@
 package com.infiproton.rag.retrieval;
 
+import com.infiproton.rag.model.RetrievalResult;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 import org.springframework.ai.document.Document;
@@ -19,13 +20,14 @@ public class RetrievalServiceTest {
     void shouldRetrieveRelevantChunks() {
         String query = "Users not able to connect to VPN";
 
-        List<Document> results = retrievalService.retrieve(query);
+        List<RetrievalResult> results = retrievalService.retrieve(query);
 
         log.info("QUERY: {}", query);
         log.info("TOTAL RESULTS: {}", results.size());
-        for(Document result: results) {
+        for(RetrievalResult result: results) {
             log.info("----------------------------------------");
-            log.info("CONTENT:\n{}", result.getText());
+            log.info("CONTENT:\n{}", result.getContent());
+            log.info("SCORE:\n{}", result.getScore());
             log.info("METADATA: {}", result.getMetadata());
         }
 

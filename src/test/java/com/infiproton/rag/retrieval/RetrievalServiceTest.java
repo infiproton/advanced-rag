@@ -1,5 +1,6 @@
 package com.infiproton.rag.retrieval;
 
+import com.infiproton.rag.dto.RetrievalRequest;
 import com.infiproton.rag.model.RetrievalResult;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
@@ -20,7 +21,7 @@ public class RetrievalServiceTest {
     void shouldRetrieveRelevantChunks() {
         String query = "Users not able to connect to VPN";
 
-        List<RetrievalResult> results = retrievalService.retrieve(query);
+        List<RetrievalResult> results = retrievalService.retrieve(new RetrievalRequest(query, null));
 
         log.info("QUERY: {}", query);
         log.info("TOTAL RESULTS: {}", results.size());

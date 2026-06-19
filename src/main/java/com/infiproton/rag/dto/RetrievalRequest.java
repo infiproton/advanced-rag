@@ -7,4 +7,5 @@ import lombok.Data;
 @AllArgsConstructor
 public class RetrievalRequest {
     private String query;
+    private String sourceType;
 }

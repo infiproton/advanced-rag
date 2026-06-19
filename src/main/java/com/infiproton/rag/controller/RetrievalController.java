@@ -20,6 +20,6 @@ public class RetrievalController {
 
     @PostMapping
     public List<RetrievalResult> retrieve(@RequestBody RetrievalRequest request) {
-        return  retrievalService.retrieve(request.getQuery());
+        return  retrievalService.retrieve(request);
     }
 }

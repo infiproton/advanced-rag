@@ -1,5 +1,6 @@
 package com.infiproton.rag.retrieval;
 
+import com.infiproton.rag.dto.RetrievalRequest;
 import com.infiproton.rag.model.RetrievalResult;
 import lombok.RequiredArgsConstructor;
 import org.springframework.ai.document.Document;
@@ -16,13 +17,17 @@ public class RetrievalService {
 
     private final VectorStore vectorStore;
 
-    public List<RetrievalResult> retrieve(String query) {
-        SearchRequest searchRequest = SearchRequest.builder()
-                .query(query)
-                .topK(3)
-                .build();
+    public List<RetrievalResult> retrieve(RetrievalRequest request) {
 
-        List<Document> documents = vectorStore.similaritySearch(searchRequest);
+        SearchRequest.Builder builder = SearchRequest.builder()
+                .query(request.getQuery())
+                .topK(3);
+
+        if(request.getSourceType() != null) {
+            builder.filterExpression("sourceType == '" + request.getSourceType() + "'");
+        }
+
+        List<Document> documents = vectorStore.similaritySearch(builder.build());
 
         List<RetrievalResult> results = new ArrayList<>();
         for(Document document: documents) {

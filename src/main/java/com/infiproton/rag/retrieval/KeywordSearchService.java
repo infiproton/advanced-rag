@@ -44,6 +44,9 @@ public class KeywordSearchService {
             }
             result.setMetadata(metadata);
 
+            result.setRetrievalType("KEYWORD");
+            result.setFinalScore(0.7);
+
             return result;
         }, query);
     }

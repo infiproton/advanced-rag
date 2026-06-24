@@ -6,6 +6,7 @@ import com.infiproton.rag.dto.RetrievalRequest;
 import com.infiproton.rag.model.RetrievalResult;
 import com.infiproton.rag.retrieval.HybridSearchService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.stereotype.Service;
 
@@ -13,6 +14,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class ChatService {
 
     private final ChatClient chatClient;
@@ -26,6 +28,7 @@ public class ChatService {
         List<RetrievalResult> results = hybridSearchService.search(retrievalRequest);
 
         String prompt = promptOrchestrationService.buildPrompt(chatRequest.getMessage(), results);
+        log.info("PROMPT: \n{}", prompt);
 
         String aiResponse = chatClient.prompt()
                 .user(prompt)

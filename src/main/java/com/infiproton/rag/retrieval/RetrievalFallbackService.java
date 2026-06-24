@@ -77,6 +77,6 @@ public class RetrievalFallbackService {
 
         Double score = results.get(0).getScore();
 
-        return score == null || score < 0.8;
+        return score == null || score < 0.9;
     }
 }

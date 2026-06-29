@@ -45,6 +45,9 @@ dependencies {
 
     implementation 'org.springframework.ai:spring-ai-starter-vector-store-pgvector'
 
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
+    implementation 'io.micrometer:micrometer-registry-prometheus'
+
 }
 
 dependencyManagement {

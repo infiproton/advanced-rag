@@ -10,4 +10,10 @@ import lombok.NoArgsConstructor;
 public class RetrievalRequest {
     private String query;
     private String sourceType;
+    private String environment;
+
+    public RetrievalRequest(String query, String sourceType) {
+        this.query = query;
+        this.sourceType = sourceType;
+    }
 }

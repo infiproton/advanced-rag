@@ -23,8 +23,18 @@ public class RetrievalService {
                 .query(request.getQuery())
                 .topK(3);
 
+        List<String> filters = new ArrayList<>();
+
         if(request.getSourceType() != null) {
-            builder.filterExpression("sourceType == '" + request.getSourceType() + "'");
+            filters.add("sourceType == '" + request.getSourceType() + "'");
+        }
+
+        if(request.getEnvironment() != null) {
+            filters.add("environment == '" + request.getEnvironment() + "'");
+        }
+
+        if(!filters.isEmpty()) {
+            builder.filterExpression(String.join(" && ", filters));
         }
 
         List<Document> documents = vectorStore.similaritySearch(builder.build());

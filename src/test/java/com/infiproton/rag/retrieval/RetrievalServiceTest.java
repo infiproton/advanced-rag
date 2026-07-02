@@ -19,8 +19,8 @@ public class RetrievalServiceTest {
 
     @Test
     void shouldRetrieveRelevantChunks() {
-        String query = "Priya Raman";
-        RetrievalRequest request = new RetrievalRequest(query, null);
+        String query = "AUTH-403";
+        RetrievalRequest request = new RetrievalRequest(query, "DATABASE");
 
         List<RetrievalResult> results = retrievalService.retrieve(request);
 
@@ -29,7 +29,7 @@ public class RetrievalServiceTest {
         for(RetrievalResult result: results) {
             log.info("----------------------------------------");
             log.info("CONTENT:\n{}", result.getContent());
-            log.info("SCORE:\n{}", result.getScore());
+            log.info("SCORE:\n{}", result.getFinalScore());
             log.info("METADATA: {}", result.getMetadata());
         }
 

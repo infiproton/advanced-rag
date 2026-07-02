@@ -4,6 +4,8 @@ import com.infiproton.rag.model.RetrievalResult;
 import com.infiproton.rag.model.SourceType;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
 
@@ -31,6 +33,15 @@ public class RerankingService {
             if("HIGH".equals(priority)){
                 score += 0.2;
             }
+
+            Object updatedAtValue = metadata.get("updatedAt");
+            if(updatedAtValue instanceof String updatedAtString) {
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+                LocalDateTime updatedAt = LocalDateTime.parse(updatedAtString, formatter);
+                double freshnessBoost = FreshnessScoringUtil.calculateBoost(updatedAt);
+                score += freshnessBoost;
+            }
+
             result.setFinalScore(score);
         }
 

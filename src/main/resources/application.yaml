@@ -11,7 +11,7 @@ spring:
         dimensions: 1536
 
   datasource:
-    url: jdbc:postgresql://localhost:15432/self_support_db
+    url: jdbc:postgresql://localhost:5432/support_db
     username: postgres
     password: postgres
 

@@ -12,6 +12,7 @@ import io.micrometer.core.instrument.Timer;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -27,7 +28,13 @@ public class ChatService {
     private final MeterRegistry meterRegistry;
     private final AuditService auditService;
 
+    @Cacheable(
+            value="chatResponses",
+            key="T(com.infiproton.rag.security.TenantContext).getTenant() + ':' + #chatRequest.message.trim().toLowerCase()"
+    )
     public ChatResponse getResponse(ChatRequest chatRequest, String userId) {
+
+        log.info("Executing FULL RAG pipeline for query: {}", chatRequest.getMessage());
 
         RetrievalRequest retrievalRequest = new RetrievalRequest();
         retrievalRequest.setQuery(chatRequest.getMessage());

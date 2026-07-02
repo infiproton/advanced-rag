@@ -2,6 +2,7 @@ package com.infiproton.rag.controller;
 
 import com.infiproton.rag.dto.ChatRequest;
 import com.infiproton.rag.dto.ChatResponse;
+import com.infiproton.rag.security.TenantContext;
 import com.infiproton.rag.service.ChatService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -18,7 +19,9 @@ public class ChatController {
 
     @PostMapping("/chat")
     public ChatResponse chat(@RequestBody ChatRequest request) {
-        return chatService.getResponse(request);
+        String currentUser = "admin@nexacorp.com";
+        TenantContext.setTenant("TENANT_BETA");
+        return chatService.getResponse(request,  currentUser);
     }
 
 }

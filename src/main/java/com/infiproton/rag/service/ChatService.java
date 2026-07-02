@@ -1,10 +1,12 @@
 package com.infiproton.rag.service;
 
+import com.infiproton.rag.audit.AuditService;
 import com.infiproton.rag.dto.ChatRequest;
 import com.infiproton.rag.dto.ChatResponse;
 import com.infiproton.rag.dto.RetrievalRequest;
 import com.infiproton.rag.model.RetrievalResult;
 import com.infiproton.rag.retrieval.HybridSearchService;
+import com.infiproton.rag.security.TenantContext;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Timer;
 import lombok.RequiredArgsConstructor;
@@ -23,8 +25,10 @@ public class ChatService {
     private final HybridSearchService hybridSearchService;
     private final PromptOrchestrationService promptOrchestrationService;
     private final MeterRegistry meterRegistry;
+    private final AuditService auditService;
 
-    public ChatResponse getResponse(ChatRequest chatRequest) {
+    public ChatResponse getResponse(ChatRequest chatRequest, String userId) {
+
         RetrievalRequest retrievalRequest = new RetrievalRequest();
         retrievalRequest.setQuery(chatRequest.getMessage());
 
@@ -48,6 +52,9 @@ public class ChatService {
                 .map(result -> (String) result.getMetadata().get("source"))
                 .distinct()
                 .toList();
+
+        auditService.logQuery(userId, TenantContext.getTenant(), chatRequest.getMessage(),
+                sources, true);
         return new ChatResponse(aiResponse, sources);
     }
 }

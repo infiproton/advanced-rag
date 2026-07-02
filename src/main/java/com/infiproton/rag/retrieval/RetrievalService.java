@@ -2,6 +2,7 @@ package com.infiproton.rag.retrieval;
 
 import com.infiproton.rag.dto.RetrievalRequest;
 import com.infiproton.rag.model.RetrievalResult;
+import com.infiproton.rag.security.TenantContext;
 import lombok.RequiredArgsConstructor;
 import org.springframework.ai.document.Document;
 import org.springframework.ai.vectorstore.SearchRequest;
@@ -31,6 +32,11 @@ public class RetrievalService {
 
         if(request.getEnvironment() != null) {
             filters.add("environment == '" + request.getEnvironment() + "'");
+        }
+
+        String tenantId = TenantContext.getTenant();
+        if(tenantId != null) {
+            filters.add("tenantId == '" + tenantId + "'");
         }
 
         if(!filters.isEmpty()) {

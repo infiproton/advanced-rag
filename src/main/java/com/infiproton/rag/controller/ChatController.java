@@ -20,7 +20,7 @@ public class ChatController {
     @PostMapping("/chat")
     public ChatResponse chat(@RequestBody ChatRequest request) {
         String currentUser = "admin@nexacorp.com";
-        TenantContext.setTenant("TENANT_BETA");
+        //TenantContext.setTenant("TENANT_BETA");
         return chatService.getResponse(request,  currentUser);
     }
 

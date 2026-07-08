@@ -3,9 +3,12 @@ package com.infiproton.rag.service;
 import com.infiproton.rag.dto.ChatResponse;
 import com.infiproton.rag.dto.RetrievalRequest;
 import com.infiproton.rag.model.RetrievalResult;
+import com.infiproton.rag.model.RetrievalStrategy;
 import com.infiproton.rag.query.QueryRewritingService;
+import com.infiproton.rag.retrieval.MultiQueryRetrievalService;
 import com.infiproton.rag.retrieval.RetrievalFallbackService;
 import com.infiproton.rag.retrieval.RetrievalService;
+import com.infiproton.rag.retrieval.RetrievalStrategyResolver;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.client.ChatClient;
@@ -24,14 +27,19 @@ public class SelfRagService {
     private final AnswerEvaluationService  answerEvaluationService;
     private final ChatClient chatClient;
     private final RetrievalFallbackService retrievalFallbackService;
+    private final RetrievalStrategyResolver retrievalStrategyResolver;
+    private final MultiQueryRetrievalService multiQueryRetrievalService;
 
     public ChatResponse generateAnswer(String query) {
         log.info("SELF-RAG: Initial retrieval started");
 
+        RetrievalStrategy retrievalStrategy = retrievalStrategyResolver.resolve(query);
+        log.info("Adaptive Retrieval Strategy Selected: {} ", retrievalStrategy);
+
         RetrievalRequest retrievalRequest = new RetrievalRequest();
         retrievalRequest.setQuery(query);
 
-        List<RetrievalResult> retrievalResults = retrievalService.retrieve(retrievalRequest);
+        List<RetrievalResult> retrievalResults = retrieve(query, retrievalStrategy);
         if(isWeakRetrieval(retrievalResults)) {
             log.info("CORRECTIVE-RAG: Weak retrieval detected. Applying retrieval fallback strategies.");
             retrievalResults = retrievalFallbackService.retrieve(query);
@@ -75,6 +83,20 @@ public class SelfRagService {
 
         return new ChatResponse(improvedAnswer, sources);
     }
+
+    private List<RetrievalResult> retrieve(String query, RetrievalStrategy retrievalStrategy) {
+
+        return switch (retrievalStrategy) {
+            case CORRECTIVE -> retrievalFallbackService.retrieve(query);
+            case MULTI_QUERY -> multiQueryRetrievalService.retrieve(query);
+            default -> {
+                RetrievalRequest request = new RetrievalRequest();
+                request.setQuery(query);
+                yield retrievalService.retrieve(request);
+            }
+        };
+    }
+
 
     private boolean isWeakRetrieval(List<RetrievalResult> results) {
         if(results.isEmpty()) {

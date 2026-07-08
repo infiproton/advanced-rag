@@ -4,6 +4,7 @@ import com.infiproton.rag.dto.ChatResponse;
 import com.infiproton.rag.dto.RetrievalRequest;
 import com.infiproton.rag.model.RetrievalResult;
 import com.infiproton.rag.query.QueryRewritingService;
+import com.infiproton.rag.retrieval.RetrievalFallbackService;
 import com.infiproton.rag.retrieval.RetrievalService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -22,7 +23,7 @@ public class SelfRagService {
     private final PromptOrchestrationService promptOrchestrationService;
     private final AnswerEvaluationService  answerEvaluationService;
     private final ChatClient chatClient;
-
+    private final RetrievalFallbackService retrievalFallbackService;
 
     public ChatResponse generateAnswer(String query) {
         log.info("SELF-RAG: Initial retrieval started");
@@ -31,6 +32,10 @@ public class SelfRagService {
         retrievalRequest.setQuery(query);
 
         List<RetrievalResult> retrievalResults = retrievalService.retrieve(retrievalRequest);
+        if(isWeakRetrieval(retrievalResults)) {
+            log.info("CORRECTIVE-RAG: Weak retrieval detected. Applying retrieval fallback strategies.");
+            retrievalResults = retrievalFallbackService.retrieve(query);
+        }
 
         String answer = generateAnswerFromResults(query, retrievalResults);
         log.info("ANSWER: {}", answer);
@@ -69,6 +74,14 @@ public class SelfRagService {
                 .toList();
 
         return new ChatResponse(improvedAnswer, sources);
+    }
+
+    private boolean isWeakRetrieval(List<RetrievalResult> results) {
+        if(results.isEmpty()) {
+            return true;
+        }
+        Double score = results.get(0).getFinalScore();
+        return score == null || score < 0.9;
     }
 
     private String generateAnswerFromResults(String query, List<RetrievalResult> retrievalResults) {

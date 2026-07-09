@@ -2,6 +2,7 @@ package com.infiproton.rag.service;
 
 import com.infiproton.rag.dto.ChatResponse;
 import com.infiproton.rag.dto.RetrievalRequest;
+import com.infiproton.rag.graph.GraphRagEnrichmentService;
 import com.infiproton.rag.model.RetrievalResult;
 import com.infiproton.rag.model.RetrievalStrategy;
 import com.infiproton.rag.query.QueryRewritingService;
@@ -29,6 +30,7 @@ public class SelfRagService {
     private final RetrievalFallbackService retrievalFallbackService;
     private final RetrievalStrategyResolver retrievalStrategyResolver;
     private final MultiQueryRetrievalService multiQueryRetrievalService;
+    private final GraphRagEnrichmentService graphRagEnrichmentService;
 
     public ChatResponse generateAnswer(String query) {
         log.info("SELF-RAG: Initial retrieval started");
@@ -108,6 +110,16 @@ public class SelfRagService {
 
     private String generateAnswerFromResults(String query, List<RetrievalResult> retrievalResults) {
         String prompt = promptOrchestrationService.buildPrompt(query, retrievalResults);
+
+        String graphContext = graphRagEnrichmentService.buildGraphContext(retrievalResults);
+        if(!graphContext.isBlank()) {
+            prompt += """
+                    
+                    Graph Context: 
+                    %s
+                    """.formatted(graphContext);
+        }
+        log.info("FINAL PROMPT: \n{}", prompt);
 
         return chatClient.prompt().user(prompt).call().content();
     }

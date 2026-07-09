@@ -62,7 +62,12 @@ public class DatabaseIngestionService {
                     "incidentId", incidentId,
                     "severity", rs.getString("severity"),
                     "status", rs.getString("status"),
-                    "affectedServices", rs.getString("affected_services")
+                    "affectedServices", rs.getString("affected_services"),
+                    "graphEntities", List.of(
+                            "INCIDENT:"+incidentId,
+                            "SEVERITY:" + rs.getString("severity"),
+                            "SERVICE:" + rs.getString("affected_services")
+                    )
             );
 
             return new KnowledgeDocument(UUID.randomUUID().toString(),
@@ -113,7 +118,12 @@ public class DatabaseIngestionService {
                     "category", rs.getString("category"),
                     "tenantId", rs.getString("tenant_id"),
                     "environment", rs.getString("environment"),
-                    "updatedAt", rs.getString("updated_at")
+                    "updatedAt", rs.getString("updated_at"),
+                    "graphEntities", List.of(
+                            "TICKET:" + ticketId,
+                            "TEAM:" + rs.getString("assigned_team"),
+                            "ENVIRONMENT:" + rs.getString("environment")
+                    )
             );
 
             return new KnowledgeDocument(

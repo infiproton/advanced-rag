@@ -3,6 +3,7 @@ package com.infiproton.rag.graph;
 import org.springframework.data.neo4j.repository.Neo4jRepository;
 import org.springframework.data.neo4j.repository.query.Query;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -18,4 +19,14 @@ public interface EnterpriseNodeRepository extends Neo4jRepository<EnterpriseNode
            collect(m) as relatedNodes
         """)
     List<EnterpriseNode> searchGraph(String query);
+
+    @Query("""
+        MATCH (n:EnterpriseEntity)-[r]->(m)
+        WHERE n.entityId IN $entityIds
+        RETURN n,
+               collect(r) as relationships,
+               collect(m) as relatedNodes
+        """)
+    List<EnterpriseNode> findGraphContext(Collection<String> entityIds);
+
 }
